@@ -121,148 +121,144 @@
         </div>
     </section>
     <style>
-        .media-container {
-            display: flex;
-            overflow: hidden;
-            transition: transform 0.5s ease;
-            width: 80%;
+        .gallery-container {
+            width: 100%;
+            position: relative;
             margin: 0 auto;
+            max-width: 800px;
         }
         
-        .media-wrapper {
-            min-width: 100%;
-            box-sizing: border-box;
-            padding: 0 10px;
+        .media-scroller {
             display: flex;
-            justify-content: center;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            gap: 1rem;
+            padding: 1rem;
+            scrollbar-width: none; /* Firefox */
         }
         
-        .media-item {
-            max-width: 100%;
+        .media-scroller::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+        
+        .media-element {
+            scroll-snap-align: start;
+            min-width: 85%;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .media-element img, 
+        .media-element video {
+            width: 100%;
+            height: auto;
             max-height: 400px;
             object-fit: contain;
+            display: block;
         }
         
-        video.media-item {
-            background-color: #000;
-        }
-        
-        .carousel1 {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
             width: 100%;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
         }
         
-        .arrow {
+        .gallery-nav button {
+            pointer-events: all;
             background: rgba(0,0,0,0.5);
             color: white;
             border: none;
-            padding: 10px 15px;
-            font-size: 18px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
             cursor: pointer;
-            border-radius: 5px;
-            margin: 0 10px;
-            z-index: 1;
+            z-index: 10;
+            margin: 0 1rem;
         }
-        
-        .arrow:hover {
-            background: rgba(0,0,0,0.8);
-        }
-        </style>
+    </style>
+    
     <section id="galery">
         <h2 class="section-title">Galeria</h2>
-        <center>
-            <div class="carousel1">
-                <button class="arrow arrow-left">&lt;</button>
-                <div class="media-container">
-                    <!-- Media files will be dynamically generated here -->
-                </div>
-                <button class="arrow arrow-right">&gt;</button>
+        <div class="gallery-container">
+            <div class="media-scroller" id="mediaScroller">
+                <!-- Itens serão inseridos via JavaScript -->
             </div>
-        </center>
-        <script>
-            const mediaFolder = "assets/photos/";
-            const mediaContainer = document.querySelector('.media-container');
-            let mediaFiles = [];
-            let currentIndex = 0;
-            
-            // Function to fetch all files from the folder (simulated here)
-            // In a real implementation, you would need server-side code to list files
-            function getMediaFiles() {
-                // This is just an example - replace with your actual files
-                return [
-                    "jr1.jpg", "jr2.jpg", "jr3.jpg", 
-                    "jr4.jpg", "jr5.jpg", "jr6.jpg",
-                    "jr8.jpg", "jr7.jpg", "jr9.jpg"
-                ];
-            }
-            
-            // Function to create media element
-            function createMediaElement(file) {
-                const fileExt = file.split('.').pop().toLowerCase();
-                const mediaWrapper = document.createElement('div');
-                mediaWrapper.className = 'media-wrapper';
-                
-                if (['mp4', 'webm', 'ogg'].includes(fileExt)) {
-                    const videoElement = document.createElement('video');
-                    videoElement.src = `${mediaFolder}${file}`;
-                    videoElement.controls = true;
-                    videoElement.className = 'media-item';
-                    mediaWrapper.appendChild(videoElement);
-                } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExt)) {
-                    const imgElement = document.createElement('img');
-                    imgElement.src = `${mediaFolder}${file}`;
-                    imgElement.className = 'media-item';
-                    mediaWrapper.appendChild(imgElement);
-                }
-                
-                return mediaWrapper;
-            }
-            
-            // Initialize the carousel
-            function initCarousel() {
-                mediaFiles = getMediaFiles();
-                mediaContainer.innerHTML = '';
-                
-                mediaFiles.forEach(file => {
-                    const mediaElement = createMediaElement(file);
-                    mediaContainer.appendChild(mediaElement);
-                });
-                
-                updateCarousel();
-            }
-            
-            function updateCarousel() {
-                if (mediaContainer.children.length > 0) {
-                    const mediaWidth = mediaContainer.children[0].offsetWidth;
-                    mediaContainer.style.transform = `translateX(-${currentIndex * mediaWidth}px)`;
-                }
-            }
-            
-            // Navigation
-            document.querySelector('.arrow-left').addEventListener('click', () => {
-                if (currentIndex > 0) {
-                    currentIndex--;
-                    updateCarousel();
-                }
-            });
-            
-            document.querySelector('.arrow-right').addEventListener('click', () => {
-                if (currentIndex < mediaFiles.length - 1) {
-                    currentIndex++;
-                    updateCarousel();
-                }
-            });
-            
-            // Initialize on window load
-            window.addEventListener('load', () => {
-                initCarousel();
-                window.addEventListener('resize', updateCarousel);
-            });
-            </script>
+            <div class="gallery-nav">
+                <button class="arrow-left" id="prevBtn">❮</button>
+                <button class="arrow-right" id="nextBtn">❯</button>
+            </div>
+        </div>
     </section>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mediaFiles = [
+            "jr1.jpg", "jr2.jpg", "jr3.jpg", 
+            "jr4.jpg", "jr5.jpg", "jr6.jpg",
+            "jr8.jpg", "jr7.jpg", "jr10.jpg","jr11.jpg","jr12.jpg","jr13.jpg","jr14.jpg","jr15.jpg","jr16.jpg","jr17.jpg","jr18.jpg","jr19.jpg","jr20.jpg","jr21.jpg","jr22.jpg", 
+        ];
+        
+        const mediaScroller = document.getElementById('mediaScroller');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        // Carrega as mídias
+        mediaFiles.forEach(file => {
+            const ext = file.split('.').pop().toLowerCase();
+            const mediaElement = document.createElement('div');
+            mediaElement.className = 'media-element';
+            
+            if (['mp4', 'webm', 'ogg'].includes(ext)) {
+                const video = document.createElement('video');
+                video.src = `assets/photos/${file}`;
+                video.controls = true;
+                mediaElement.appendChild(video);
+            } else {
+                const img = document.createElement('img');
+                img.src = `assets/photos/${file}`;
+                img.alt = "Galeria JR Ar Condicionados";
+                img.loading = "lazy";
+                mediaElement.appendChild(img);
+            }
+            
+            mediaScroller.appendChild(mediaElement);
+        });
+        
+        // Navegação
+        prevBtn.addEventListener('click', () => {
+            mediaScroller.scrollBy({
+                left: -mediaScroller.offsetWidth * 0.85,
+                behavior: 'smooth'
+            });
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            mediaScroller.scrollBy({
+                left: mediaScroller.offsetWidth * 0.85,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Esconde botões quando não há mais para rolar
+        const checkNavButtons = () => {
+            prevBtn.style.visibility = mediaScroller.scrollLeft <= 10 ? 'hidden' : 'visible';
+            nextBtn.style.visibility = mediaScroller.scrollLeft >= 
+                mediaScroller.scrollWidth - mediaScroller.offsetWidth - 10 ? 'hidden' : 'visible';
+        };
+        
+        mediaScroller.addEventListener('scroll', checkNavButtons);
+        window.addEventListener('resize', checkNavButtons);
+        checkNavButtons();
+    });
+    </script>
     <br>
    <!-- Contato e Mapa -->
    <section id="contact">
